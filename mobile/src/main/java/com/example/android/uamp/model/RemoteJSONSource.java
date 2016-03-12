@@ -1,24 +1,7 @@
-/*
- * Copyright (C) 2014 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.example.android.uamp.model;
 
-import android.media.session.MediaSession;
+import android.os.AsyncTask;
 import android.support.v4.media.MediaMetadataCompat;
-import android.support.v4.media.session.MediaSessionCompat;
 
 import com.example.android.uamp.utils.LogHelper;
 
@@ -28,9 +11,9 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -42,33 +25,36 @@ public class RemoteJSONSource implements MusicProviderSource {
 
     private static final String TAG = LogHelper.makeLogTag(RemoteJSONSource.class);
 
-    //protected static final String CATALOG_URL = "http://storage.googleapis.com/automotive-media/music.json";
-    protected static final String CATALOG_URL = "http://private-a6f03-knr.apiary-mock.com/questions";
+    //http://kristennetradio.dk/scripts/getCurrentSong.php
+    //https://api.myjson.com/bins/2d00p
+    protected static final String CATALOG_URL =
+            "http://private-a6f03-knr.apiary-mock.com/questions";
 
-    private static final String JSON_MUSIC = "music";
-    private static final String JSON_TITLE = "title";
-    private static final String JSON_ALBUM = "album";
-    private static final String JSON_ARTIST = "artist";
-    private static final String JSON_GENRE = "genre";
-    private static final String JSON_SOURCE = "source";
-    private static final String JSON_IMAGE = "image";
-    private static final String JSON_TRACK_NUMBER = "trackNumber";
-    private static final String JSON_TOTAL_TRACK_COUNT = "totalTrackCount";
-    private static final String JSON_DURATION = "duration";
-    MediaMetadataCompat mediaMetadataCompat;
+    protected static final String URL =
+            "http://kristennetradio.dk/scripts/getCurrentSong.php";
 
-    public RemoteJSONSource() {
-    }
+    private static String XML_MUSIC = "music";
+    private static String XML_TITLE = "title";
+    private static String XML_ALBUM = "album";
+    private static String XML_ARTIST = "artist";
+    private static String XML_GENRE = "genre";
+    private static String XML_SOURCE = "source";
+    private static String XML_IMAGE = "image";
+    private static String XML_TRACK_NUMBER = "trackNumber";
+    private static String XML_TOTAL_TRACK_COUNT = "totalTrackCount";
+    private static String XML_DURATION = "duration";
 
     @Override
     public Iterator<MediaMetadataCompat> iterator() {
         try {
+            getXmlFromUrl(URL);
+
             int slashPos = CATALOG_URL.lastIndexOf('/');
             String path = CATALOG_URL.substring(0, slashPos + 1);
-            JSONObject jsonObj = fetchJSONFromUrl(CATALOG_URL);
+            JSONObject jsonObj = fetchJSONFromUrl();
             ArrayList<MediaMetadataCompat> tracks = new ArrayList<>();
             if (jsonObj != null) {
-                JSONArray jsonTracks = jsonObj.getJSONArray(JSON_MUSIC);
+                JSONArray jsonTracks = jsonObj.getJSONArray(XML_MUSIC);
 
                 if (jsonTracks != null) {
                     for (int j = 0; j < jsonTracks.length(); j++) {
@@ -83,16 +69,76 @@ public class RemoteJSONSource implements MusicProviderSource {
         }
     }
 
+    // "http://kristennetradio.dk/scripts/getCurrentSong.php"
+    private static String xml= null;
+
+    public void getXmlFromUrl(String url) {
+        try {
+            new DownloadXmlTask().execute(url);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Given a string representation of a URL, sets up a connection and gets
+    // an input stream.
+    private InputStream downloadUrl(String urlString) throws IOException {
+        URL url = new URL(urlString);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setReadTimeout(10000 /* milliseconds */);
+        conn.setConnectTimeout(15000 /* milliseconds */);
+        conn.setRequestMethod("GET");
+        conn.setDoInput(true);
+        // Starts the query
+        conn.connect();
+        InputStream stream = conn.getInputStream();
+        return stream;
+    }
+
+    public void GetXML(String url)
+    {
+        XMLPullParserHandler parser = new XMLPullParserHandler();
+        InputStream inputStream = null;
+        Item item = new Item();
+        ArrayList<Item> itemList;
+
+
+        try {
+            inputStream = downloadUrl(url);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            parser.parse(inputStream);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        item = parser.getItem();
+
+        LogHelper.e(" item.getTitle() DOOOOONEEEEEEEEEEEE", item.getTitle(),"AAAAAAAAAAAAAAA" );
+
+
+        //TODo: remove this .. maybe .. -------
+        XML_TITLE = item.getTitle();
+
+        XML_ALBUM = item.getAlbum();
+        XML_ARTIST = "ARTIST..";
+
+    }
+
+
     private MediaMetadataCompat buildFromJSON(JSONObject json, String basePath) throws JSONException {
-        String title = json.getString(JSON_TITLE);
-        String album = json.getString(JSON_ALBUM);
-        String artist = json.getString(JSON_ARTIST);
-        String genre = json.getString(JSON_GENRE);
-        String source = json.getString(JSON_SOURCE);
-        String iconUrl = json.getString(JSON_IMAGE);
-        int trackNumber = json.getInt(JSON_TRACK_NUMBER);
-        int totalTrackCount = json.getInt(JSON_TOTAL_TRACK_COUNT);
-        int duration = json.getInt(JSON_DURATION) * 1000; // ms
+        String title = json.getString(XML_TITLE);
+        String album = json.getString(XML_ALBUM);
+        String artist = json.getString(XML_ARTIST);
+        String genre = json.getString(XML_GENRE);
+        String source = json.getString(XML_SOURCE);
+        String iconUrl = json.getString(XML_IMAGE);
+        int trackNumber = json.getInt(XML_TRACK_NUMBER);
+        int totalTrackCount = json.getInt(XML_TOTAL_TRACK_COUNT);
+        int duration = json.getInt(XML_DURATION) * 1000; // ms
 
         LogHelper.d(TAG, "Found music track: ", json);
 
@@ -103,7 +149,6 @@ public class RemoteJSONSource implements MusicProviderSource {
         if (!iconUrl.startsWith("http")) {
             iconUrl = basePath + iconUrl;
         }
-
         // Since we don't have a unique ID in the server, we fake one using the hashcode of
         // the music source. In a real world app, this could come from the server.
         String id = String.valueOf(source.hashCode());
@@ -113,7 +158,7 @@ public class RemoteJSONSource implements MusicProviderSource {
         // the session metadata can be accessed by notification listeners. This is done in this
         // sample for convenience only.
         //noinspection ResourceType
-        mediaMetadataCompat = new MediaMetadataCompat.Builder()
+        return new MediaMetadataCompat.Builder()
                 .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, id)
                 .putString(MusicProviderSource.CUSTOM_METADATA_TRACK_SOURCE, source)
                 .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, album)
@@ -125,9 +170,44 @@ public class RemoteJSONSource implements MusicProviderSource {
                 .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, trackNumber)
                 .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, totalTrackCount)
                 .build();
-
-        return mediaMetadataCompat;
     }
+
+
+    private String jsonString="{\"music\" : [ {\n" +
+            "\"title\" : \"Worlds 1st music\",\n" +
+            "\"album\" : \"Jazz & Blues\",\n" +
+            "\"artist\" : \"Media Right Productions\",\n" +
+            "\"genre\" : \"Jazz & Blues\",\n" +
+            "\"source\" : \"http://lyt.kristennetradio.dk:8000\",\n" +
+            "\"image\" : \"http://kristennetradio.dk/SBC/samHTMweb/pictures/netradio.jpeg\",\n" +
+            "\"trackNumber\" : 1,\n" +
+            "\"totalTrackCount\" : 6,\n" +
+            "\"duration\" : 103,\n" +
+            "\"site\" : \"http://lyt.kristennetradio.dk:8000\"\n" +
+            "},\n" +
+            "{ \"title\" : \"The Messenger I\",\n" +
+            "\"album\" : \"Jazz & Blues\",\n" +
+            "\"artist\" : \"Silent Partner\",\n" +
+            "\"genre\" : \"Jazz & Blues\",\n" +
+            "\"source\" : \"http://lyt.kristennetradio.dk:8000\",\n" +
+            "\"image\" : \"http://kristennetradio.dk/SBC/samHTMweb/pictures/netradio.jpeg\",\n" +
+            "\"trackNumber\" : 2,\n" +
+            "\"totalTrackCount\" : 6,\n" +
+            "\"duration\" : 132,\n" +
+            "\"site\" : \"http://lyt.kristennetradio.dk:8000\"\n" +
+            "},\n" +
+            "{ \"title\" : \"The Messenger II\",\n" +
+            "\"album\" : \"Jazz & Blues\",\n" +
+            "\"artist\" : \"Silent Partner\",\n" +
+            "\"genre\" : \"Jazz & Blues\",\n" +
+            "\"source\" : \"http://lyt.kristennetradio.dk:8000\",\n" +
+            "\"image\" : \"http://kristennetradio.dk/SBC/samHTMweb/pictures/netradio.jpeg\",\n" +
+            "\"trackNumber\" : 3,\n" +
+            "\"totalTrackCount\" : 6,\n" +
+            "\"duration\" : 132,\n" +
+            "\"site\" : \"http://lyt.kristennetradio.dk:8000\"\n" +
+            "}\n" +
+            "]}";
 
     /**
      * Download a JSON file from a server, parse the content and return the JSON
@@ -135,18 +215,11 @@ public class RemoteJSONSource implements MusicProviderSource {
      *
      * @return result JSONObject containing the parsed representation.
      */
-    private JSONObject fetchJSONFromUrl(String urlString) throws JSONException {
+    private JSONObject fetchJSONFromUrl() throws JSONException {
         BufferedReader reader = null;
         try {
-            URLConnection urlConnection = new URL(urlString).openConnection();
-            reader = new BufferedReader(new InputStreamReader(
-                    urlConnection.getInputStream(), "iso-8859-1"));
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
-            }
-            return new JSONObject(sb.toString());
+            //TODO: add json from xml
+            return new JSONObject(jsonString);
         } catch (JSONException e) {
             throw e;
         } catch (Exception e) {
@@ -160,6 +233,24 @@ public class RemoteJSONSource implements MusicProviderSource {
                     // ignore
                 }
             }
+        }
+    }
+
+    // Implementation of AsyncTask used to download XML feed from stackoverflow.com.
+    private class DownloadXmlTask extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... urls) {
+            try {
+                GetXML(urls[0]);
+                return "";
+            } catch (Exception e) {
+                return e.getMessage();
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
         }
     }
 }
