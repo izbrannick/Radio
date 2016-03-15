@@ -241,10 +241,11 @@ public class RemoteJSONSource implements MusicProviderSource {
 
         @Override
         protected void onPostExecute(Item result) {
-            LogHelper.i("ItemAddedToList", result.getTitle());
-            metadataList.add(result);
-            run();
-
+            if (result != null) {
+                //LogHelper.i("ItemAddedToList", result.getTitle());
+                metadataList.add(result);
+                run();
+            }
             /*
             jsonString = "{\"music\" : [ {\n" +
                     "\"title\" : \\"+result.getTitle()+"\",\n" +
@@ -301,11 +302,11 @@ public class RemoteJSONSource implements MusicProviderSource {
                     public void run() {
 
                         getXmlFromUrl(URL);
-                        handler.postDelayed(this, 10000); // now is every 1 minutes
+                        handler.postDelayed(this, 20000); // now is every 1 minutes
                     }
                 };
 
-                handler.postDelayed(runnable , 3300); // Every 120000 ms (2 minutes)
+                handler.postDelayed(runnable , 6300); // Every 120000 ms (2 minutes)
             }
 
         }

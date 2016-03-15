@@ -279,6 +279,9 @@ public class MusicService extends MediaBrowserServiceCompat implements
     Runnable runnable = null;
     Handler handler;
 
+    String pictureRoot = "http://kristennetradio.dk/SBC/samHTMweb/pictures/";
+    String pictureName = "netradio.jpeg";
+
     //int i = 0;
     private void run()
     {
@@ -296,15 +299,19 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
                     if (MusicProviderSource.metadataList.size() > 0) {
                         int songListSize = MusicProviderSource.metadataList.size() - 1;
+                        if (MusicProviderSource.metadataList.get(songListSize).getPicture() == null)
+                            pictureName = MusicProviderSource.metadataList.get(songListSize).getPicture();
+                        else pictureName = "netradio.jpeg";
+
 
                         getMusicSession().setMetadata(new MediaMetadataCompat.Builder()
-                                .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, "123")
+                                .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, MusicProviderSource.metadataList.get(songListSize).getId())
                                 .putString(MusicProviderSource.CUSTOM_METADATA_TRACK_SOURCE, "http://lyt.kristennetradio.dk:8000")
                                 .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, MusicProviderSource.metadataList.get(songListSize).getAlbum())
-                                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, "Other")
-                                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, 60000)
+                                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, MusicProviderSource.metadataList.get(songListSize).getArtist())
+                                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, 120000)
                                 .putString(MediaMetadataCompat.METADATA_KEY_GENRE, "Other")
-                                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, "http://kristennetradio.dk/SBC/samHTMweb/pictures/netradio.jpeg")
+                                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, pictureRoot + pictureName )
                                 .putString(MediaMetadataCompat.METADATA_KEY_TITLE, MusicProviderSource.metadataList.get(songListSize).getTitle())
                                 .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, 99)
                                 .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, 99)

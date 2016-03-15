@@ -63,13 +63,13 @@ public class XMLPullParserHandler {
                         } else if (tagname.equalsIgnoreCase("year")) {
                             item.setYear(text);
                         }else if (tagname.equalsIgnoreCase("picture")) {
-                            item.setYear(text);
+                            item.setPicture(text);
                         }else if (tagname.equalsIgnoreCase("buycd")) {
-                            item.setYear(text);
+                            item.setBuycd(text);
                         }else if (tagname.equalsIgnoreCase("date_played")) {
-                            item.setYear(text);
+                            item.setDate_played(text);
                         }else if (tagname.equalsIgnoreCase("duration")) {
-                            item.setYear(text);
+                            item.setDuration(text);
                         }
                         break;
                     default:
