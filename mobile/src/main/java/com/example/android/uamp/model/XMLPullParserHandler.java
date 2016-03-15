@@ -10,29 +10,25 @@ import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 
 /**
  * Created by U321424 on 08-03-2016.
  */
 public class XMLPullParserHandler {
-    ArrayList<Item> items;
     private Item item;
     private String text;
-
-    public ArrayList<Item> getItems() {
-        return items;
-    }
 
     public Item getItem()
     {
         return item;
     }
 
-    public ArrayList<Item> parse(InputStream is) {
+    public Item parse(InputStream is) {
         XmlPullParserFactory factory = null;
         XmlPullParser parser = null;
         try {
+            item = new Item();
+
             factory = XmlPullParserFactory.newInstance();
             factory.setNamespaceAware(true);
             parser = factory.newPullParser();
@@ -55,7 +51,7 @@ public class XMLPullParserHandler {
                     case XmlPullParser.END_TAG:
                         if (tagname.equalsIgnoreCase("item")) {
                             // add Item object to list
-                            items.add(item);
+                            //items.add(item);
                         } else if (tagname.equalsIgnoreCase("id")) {
                             item.setId(text);
                         } else if (tagname.equalsIgnoreCase("artist")) {
@@ -87,7 +83,7 @@ public class XMLPullParserHandler {
             e.printStackTrace();
         }
 
-        return items;
+        return item;
     }
 
 }

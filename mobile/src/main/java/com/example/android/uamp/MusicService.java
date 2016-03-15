@@ -34,8 +34,10 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.media.MediaRouter;
 
+import com.example.android.uamp.model.Item;
 import com.example.android.uamp.model.MusicProvider;
 import com.example.android.uamp.model.MusicProviderSource;
+import com.example.android.uamp.model.XMLPullParserHandler;
 import com.example.android.uamp.playback.CastPlayback;
 import com.example.android.uamp.playback.LocalPlayback;
 import com.example.android.uamp.playback.Playback;
@@ -269,7 +271,6 @@ public class MusicService extends MediaBrowserServiceCompat implements
         mMediaRouter = MediaRouter.getInstance(getApplicationContext());
 
         registerCarConnectionReceiver();
-
         run();
     }
 
@@ -278,7 +279,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
     Runnable runnable = null;
     Handler handler;
 
-    int i = 0;
+    //int i = 0;
     private void run()
     {
         if(runnable != null)
@@ -290,21 +291,25 @@ public class MusicService extends MediaBrowserServiceCompat implements
             runnable = new Runnable() {
                 public void run() {
 
+                    //i++;
 
-                    i++;
 
-                    getMusicSession().setMetadata(new MediaMetadataCompat.Builder()
-                            .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, "123")
-                            .putString(MusicProviderSource.CUSTOM_METADATA_TRACK_SOURCE, "http://lyt.kristennetradio.dk:8000")
-                            .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, "Other")
-                            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, "Other")
-                            .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, 60000)
-                            .putString(MediaMetadataCompat.METADATA_KEY_GENRE, "Other")
-                            .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, "http://kristennetradio.dk/SBC/samHTMweb/pictures/netradio.jpeg")
-                            .putString(MediaMetadataCompat.METADATA_KEY_TITLE, "Other - "+i)
-                            .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, 99)
-                            .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, 99)
-                            .build());
+                    if (MusicProviderSource.metadataList.size() > 0) {
+                        int songListSize = MusicProviderSource.metadataList.size() - 1;
+
+                        getMusicSession().setMetadata(new MediaMetadataCompat.Builder()
+                                .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, "123")
+                                .putString(MusicProviderSource.CUSTOM_METADATA_TRACK_SOURCE, "http://lyt.kristennetradio.dk:8000")
+                                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, MusicProviderSource.metadataList.get(songListSize).getAlbum())
+                                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, "Other")
+                                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, 60000)
+                                .putString(MediaMetadataCompat.METADATA_KEY_GENRE, "Other")
+                                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, "http://kristennetradio.dk/SBC/samHTMweb/pictures/netradio.jpeg")
+                                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, MusicProviderSource.metadataList.get(songListSize).getTitle())
+                                .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, 99)
+                                .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, 99)
+                                .build());
+                    }
                     handler.postDelayed(this, 10000); // now is every 1 minutes
                 }
             };

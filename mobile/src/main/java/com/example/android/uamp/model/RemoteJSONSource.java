@@ -1,6 +1,7 @@
 package com.example.android.uamp.model;
 
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.v4.media.MediaMetadataCompat;
 
 import com.example.android.uamp.utils.LogHelper;
@@ -43,6 +44,8 @@ public class RemoteJSONSource implements MusicProviderSource {
     private static String XML_TRACK_NUMBER = "trackNumber";
     private static String XML_TOTAL_TRACK_COUNT = "totalTrackCount";
     private static String XML_DURATION = "duration";
+
+    //public ArrayList<Item> metadataList = new ArrayList<>();
 
     @Override
     public Iterator<MediaMetadataCompat> iterator() {
@@ -95,13 +98,10 @@ public class RemoteJSONSource implements MusicProviderSource {
         return stream;
     }
 
-    public void GetXML(String url)
+    public Item GetXML(String url)
     {
         XMLPullParserHandler parser = new XMLPullParserHandler();
         InputStream inputStream = null;
-        Item item = new Item();
-        ArrayList<Item> itemList;
-
 
         try {
             inputStream = downloadUrl(url);
@@ -110,22 +110,11 @@ public class RemoteJSONSource implements MusicProviderSource {
         }
 
         try {
-            parser.parse(inputStream);
+            return parser.parse(inputStream);
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
-
-        item = parser.getItem();
-
-        LogHelper.e(" item.getTitle() DOOOOONEEEEEEEEEEEE", item.getTitle(),"AAAAAAAAAAAAAAA" );
-
-
-        //TODo: remove this .. maybe .. -------
-        XML_TITLE = item.getTitle();
-
-        XML_ALBUM = item.getAlbum();
-        XML_ARTIST = "ARTIST..";
-
     }
 
 
@@ -174,10 +163,10 @@ public class RemoteJSONSource implements MusicProviderSource {
 
 
     private String jsonString="{\"music\" : [ {\n" +
-            "\"title\" : \"Worlds 1st music\",\n" +
-            "\"album\" : \"Jazz & Blues\",\n" +
-            "\"artist\" : \"Media Right Productions\",\n" +
-            "\"genre\" : \"Jazz & Blues\",\n" +
+            "\"title\" : \"Kristen Net Radio\",\n" +
+            "\"album\" : \"Mere end bare musik\",\n" +
+            "\"artist\" : \"KNR\",\n" +
+            "\"genre\" : \"Mere end bare musik\",\n" +
             "\"source\" : \"http://lyt.kristennetradio.dk:8000\",\n" +
             "\"image\" : \"http://kristennetradio.dk/SBC/samHTMweb/pictures/netradio.jpeg\",\n" +
             "\"trackNumber\" : 1,\n" +
@@ -185,10 +174,10 @@ public class RemoteJSONSource implements MusicProviderSource {
             "\"duration\" : 103,\n" +
             "\"site\" : \"http://lyt.kristennetradio.dk:8000\"\n" +
             "},\n" +
-            "{ \"title\" : \"The Messenger I\",\n" +
-            "\"album\" : \"Jazz & Blues\",\n" +
-            "\"artist\" : \"Silent Partner\",\n" +
-            "\"genre\" : \"Jazz & Blues\",\n" +
+            "{ \"title\" : \"Kristen Net Radio\",\n" +
+            "\"album\" : \"Mere end bare musik\",\n" +
+            "\"artist\" : \"KNR\",\n" +
+            "\"genre\" : \"Mere end bare musik\",\n" +
             "\"source\" : \"http://lyt.kristennetradio.dk:8000\",\n" +
             "\"image\" : \"http://kristennetradio.dk/SBC/samHTMweb/pictures/netradio.jpeg\",\n" +
             "\"trackNumber\" : 2,\n" +
@@ -196,10 +185,10 @@ public class RemoteJSONSource implements MusicProviderSource {
             "\"duration\" : 132,\n" +
             "\"site\" : \"http://lyt.kristennetradio.dk:8000\"\n" +
             "},\n" +
-            "{ \"title\" : \"The Messenger II\",\n" +
-            "\"album\" : \"Jazz & Blues\",\n" +
-            "\"artist\" : \"Silent Partner\",\n" +
-            "\"genre\" : \"Jazz & Blues\",\n" +
+            "{ \"title\" : \"Kristen Net Radio\",\n" +
+            "\"album\" : \"Mere end bare musik\",\n" +
+            "\"artist\" : \"KNR\",\n" +
+            "\"genre\" : \"Mere end bare musik\",\n" +
             "\"source\" : \"http://lyt.kristennetradio.dk:8000\",\n" +
             "\"image\" : \"http://kristennetradio.dk/SBC/samHTMweb/pictures/netradio.jpeg\",\n" +
             "\"trackNumber\" : 3,\n" +
@@ -237,20 +226,88 @@ public class RemoteJSONSource implements MusicProviderSource {
     }
 
     // Implementation of AsyncTask used to download XML feed from stackoverflow.com.
-    private class DownloadXmlTask extends AsyncTask<String, Void, String> {
+    private class DownloadXmlTask extends AsyncTask<String, Void, Item> {
 
         @Override
-        protected String doInBackground(String... urls) {
+        protected Item doInBackground(String... urls) {
             try {
-                GetXML(urls[0]);
-                return "";
+
+                return GetXML(urls[0]);
             } catch (Exception e) {
-                return e.getMessage();
+                 e.getMessage();
+                return null;
             }
         }
 
         @Override
-        protected void onPostExecute(String result) {
+        protected void onPostExecute(Item result) {
+            LogHelper.i("ItemAddedToList", result.getTitle());
+            metadataList.add(result);
+            run();
+
+            /*
+            jsonString = "{\"music\" : [ {\n" +
+                    "\"title\" : \\"+result.getTitle()+"\",\n" +
+                    "\"album\" : \"Mere end bare musik\",\n" +
+                    "\"artist\" : \"KNR\",\n" +
+                    "\"genre\" : \"Mere end bare musik\",\n" +
+                    "\"source\" : \"http://lyt.kristennetradio.dk:8000\",\n" +
+                    "\"image\" : \"http://kristennetradio.dk/SBC/samHTMweb/pictures/netradio.jpeg\",\n" +
+                    "\"trackNumber\" : 1,\n" +
+                    "\"totalTrackCount\" : 6,\n" +
+                    "\"duration\" : 103,\n" +
+                    "\"site\" : \"http://lyt.kristennetradio.dk:8000\"\n" +
+                    "},\n" +
+                    "{ \"title\" : \\"+result.getTitle()+"\",\n" +
+                    "\"album\" : \"Mere end bare musik\",\n" +
+                    "\"artist\" : \"KNR\",\n" +
+                    "\"genre\" : \"Mere end bare musik\",\n" +
+                    "\"source\" : \"http://lyt.kristennetradio.dk:8000\",\n" +
+                    "\"image\" : \"http://kristennetradio.dk/SBC/samHTMweb/pictures/netradio.jpeg\",\n" +
+                    "\"trackNumber\" : 2,\n" +
+                    "\"totalTrackCount\" : 6,\n" +
+                    "\"duration\" : 132,\n" +
+                    "\"site\" : \"http://lyt.kristennetradio.dk:8000\"\n" +
+                    "},\n" +
+                    "{ \"title\" : \\"+result.getTitle()+"\",\n" +
+                    "\"album\" : \"Mere end bare musik\",\n" +
+                    "\"artist\" : \"KNR\",\n" +
+                    "\"genre\" : \"Mere end bare musik\",\n" +
+                    "\"source\" : \"http://lyt.kristennetradio.dk:8000\",\n" +
+                    "\"image\" : \"http://kristennetradio.dk/SBC/samHTMweb/pictures/netradio.jpeg\",\n" +
+                    "\"trackNumber\" : 3,\n" +
+                    "\"totalTrackCount\" : 6,\n" +
+                    "\"duration\" : 132,\n" +
+                    "\"site\" : \"http://lyt.kristennetradio.dk:8000\"\n" +
+                    "}\n" +
+                    "]}";
+            */
+        }
+
+        //TODO: Complete propper implementation
+        Runnable runnable = null;
+        Handler handler;
+
+        int i = 0;
+        private void run()
+        {
+            if(runnable != null)
+                handler.removeCallbacks(runnable);
+
+            if(handler == null) {
+                handler = new Handler();
+
+                runnable = new Runnable() {
+                    public void run() {
+
+                        getXmlFromUrl(URL);
+                        handler.postDelayed(this, 10000); // now is every 1 minutes
+                    }
+                };
+
+                handler.postDelayed(runnable , 3300); // Every 120000 ms (2 minutes)
+            }
+
         }
     }
 }
