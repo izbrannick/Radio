@@ -282,7 +282,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
     String pictureRoot = "http://kristennetradio.dk/SBC/samHTMweb/pictures/";
     String pictureName = "netradio.jpeg";
 
-    //int i = 0;
+    int i = 0;
     private void run()
     {
         if(runnable != null)
@@ -294,7 +294,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
             runnable = new Runnable() {
                 public void run() {
 
-                    //i++;
+                    i++;
 
 
                     if (MusicProviderSource.metadataList.size() > 0) {
@@ -310,10 +310,10 @@ public class MusicService extends MediaBrowserServiceCompat implements
                                 .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, MusicProviderSource.metadataList.get(songListSize).getAlbum())
                                 .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, MusicProviderSource.metadataList.get(songListSize).getArtist())
                                 .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, 120000)
-                                .putString(MediaMetadataCompat.METADATA_KEY_GENRE, "Other")
+                                .putString(MediaMetadataCompat.METADATA_KEY_GENRE, "Mere end bare musik")
                                 .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, pictureRoot + pictureName )
                                 .putString(MediaMetadataCompat.METADATA_KEY_TITLE, MusicProviderSource.metadataList.get(songListSize).getTitle())
-                                .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, 99)
+                                .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, i)
                                 .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, 99)
                                 .build());
                     }

@@ -244,45 +244,8 @@ public class RemoteJSONSource implements MusicProviderSource {
             if (result != null) {
                 //LogHelper.i("ItemAddedToList", result.getTitle());
                 metadataList.add(result);
-                run();
+                getXmlFromUrl(URL);
             }
-            /*
-            jsonString = "{\"music\" : [ {\n" +
-                    "\"title\" : \\"+result.getTitle()+"\",\n" +
-                    "\"album\" : \"Mere end bare musik\",\n" +
-                    "\"artist\" : \"KNR\",\n" +
-                    "\"genre\" : \"Mere end bare musik\",\n" +
-                    "\"source\" : \"http://lyt.kristennetradio.dk:8000\",\n" +
-                    "\"image\" : \"http://kristennetradio.dk/SBC/samHTMweb/pictures/netradio.jpeg\",\n" +
-                    "\"trackNumber\" : 1,\n" +
-                    "\"totalTrackCount\" : 6,\n" +
-                    "\"duration\" : 103,\n" +
-                    "\"site\" : \"http://lyt.kristennetradio.dk:8000\"\n" +
-                    "},\n" +
-                    "{ \"title\" : \\"+result.getTitle()+"\",\n" +
-                    "\"album\" : \"Mere end bare musik\",\n" +
-                    "\"artist\" : \"KNR\",\n" +
-                    "\"genre\" : \"Mere end bare musik\",\n" +
-                    "\"source\" : \"http://lyt.kristennetradio.dk:8000\",\n" +
-                    "\"image\" : \"http://kristennetradio.dk/SBC/samHTMweb/pictures/netradio.jpeg\",\n" +
-                    "\"trackNumber\" : 2,\n" +
-                    "\"totalTrackCount\" : 6,\n" +
-                    "\"duration\" : 132,\n" +
-                    "\"site\" : \"http://lyt.kristennetradio.dk:8000\"\n" +
-                    "},\n" +
-                    "{ \"title\" : \\"+result.getTitle()+"\",\n" +
-                    "\"album\" : \"Mere end bare musik\",\n" +
-                    "\"artist\" : \"KNR\",\n" +
-                    "\"genre\" : \"Mere end bare musik\",\n" +
-                    "\"source\" : \"http://lyt.kristennetradio.dk:8000\",\n" +
-                    "\"image\" : \"http://kristennetradio.dk/SBC/samHTMweb/pictures/netradio.jpeg\",\n" +
-                    "\"trackNumber\" : 3,\n" +
-                    "\"totalTrackCount\" : 6,\n" +
-                    "\"duration\" : 132,\n" +
-                    "\"site\" : \"http://lyt.kristennetradio.dk:8000\"\n" +
-                    "}\n" +
-                    "]}";
-            */
         }
 
         //TODO: Complete propper implementation
@@ -301,7 +264,7 @@ public class RemoteJSONSource implements MusicProviderSource {
                 runnable = new Runnable() {
                     public void run() {
 
-                        getXmlFromUrl(URL);
+
                         handler.postDelayed(this, 20000); // now is every 1 minutes
                     }
                 };
