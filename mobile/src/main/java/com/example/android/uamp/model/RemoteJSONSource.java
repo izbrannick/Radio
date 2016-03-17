@@ -225,6 +225,8 @@ public class RemoteJSONSource implements MusicProviderSource {
         }
     }
 
+    String currentSongID = "none";
+
     // Implementation of AsyncTask used to download XML feed from stackoverflow.com.
     private class DownloadXmlTask extends AsyncTask<String, Void, Item> {
 
@@ -242,36 +244,26 @@ public class RemoteJSONSource implements MusicProviderSource {
         @Override
         protected void onPostExecute(Item result) {
             if (result != null) {
-                //LogHelper.i("ItemAddedToList", result.getTitle());
-                metadataList.add(result);
+
+                try{
+                    if (currentSongID.equals("none"))
+                    {
+                        currentSongID = result.getId();
+                        metadataList.add(result);
+                        return;
+                    }
+                    if (!currentSongID.equals(result.getId()) )
+                    {
+                        currentSongID = result.getId();
+                        metadataList.add(result);
+                        return;
+                    }
+                }catch (Exception e)
+                {
+                    return;
+                }
                 getXmlFromUrl(URL);
             }
-        }
-
-        //TODO: Complete propper implementation
-        Runnable runnable = null;
-        Handler handler;
-
-        int i = 0;
-        private void run()
-        {
-            if(runnable != null)
-                handler.removeCallbacks(runnable);
-
-            if(handler == null) {
-                handler = new Handler();
-
-                runnable = new Runnable() {
-                    public void run() {
-
-
-                        handler.postDelayed(this, 20000); // now is every 1 minutes
-                    }
-                };
-
-                handler.postDelayed(runnable , 6300); // Every 120000 ms (2 minutes)
-            }
-
         }
     }
 }
