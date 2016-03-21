@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.android.uamp.playback;
+package dk.glutter.android.knr.playback;
 
 import android.support.annotation.NonNull;
 import android.support.test.runner.AndroidJUnit4;
@@ -21,11 +21,11 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.test.mock.MockResources;
 
-import com.example.android.uamp.TestSetupHelper;
-import com.example.android.uamp.model.MusicProvider;
-import com.example.android.uamp.utils.MediaIDHelper;
-import com.example.android.uamp.utils.QueueHelper;
-import com.example.android.uamp.utils.SimpleMusicProviderSource;
+import dk.glutter.android.knr.TestSetupHelper;
+import dk.glutter.android.knr.model.MusicProvider;
+import dk.glutter.android.knr.utils.MediaIDHelper;
+import dk.glutter.android.knr.utils.QueueHelper;
+import dk.glutter.android.knr.utils.SimpleMusicProviderSource;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -177,7 +177,7 @@ public class QueueManagerTest {
         queueManager.setCurrentQueue("Queue 1", queue);
 
         // test 2: set queue index to an invalid queueId (we assume MAX_VALUE is invalid, because
-        // queueIds are, in uAmp, defined as the item's index, and no queue is big enough to have
+        // queueIds are, in knr, defined as the item's index, and no queue is big enough to have
         // a MAX_VALUE index)
         assertFalse(queueManager.setCurrentQueueItem(Integer.MAX_VALUE));
 

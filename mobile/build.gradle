@@ -20,7 +20,7 @@ android {
     buildToolsVersion "23.0.2"
 
     defaultConfig {
-        applicationId "com.example.android.uamp"
+        applicationId "dk.glutter.android.knr"
         minSdkVersion 17
         targetSdkVersion 23
         versionCode 2
