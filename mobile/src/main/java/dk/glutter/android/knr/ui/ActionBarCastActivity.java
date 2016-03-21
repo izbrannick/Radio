@@ -63,7 +63,6 @@ public abstract class ActionBarCastActivity extends AppCompatActivity {
 
     private boolean mToolbarInitialized;
 
-    private int mItemToOpenWhenDrawerCloses = -1;
 
     private final VideoCastConsumerImpl mCastConsumer = new VideoCastConsumerImpl() {
 
@@ -99,47 +98,6 @@ public abstract class ActionBarCastActivity extends AppCompatActivity {
 
     };
 
-    private final DrawerLayout.DrawerListener mDrawerListener = new DrawerLayout.DrawerListener() {
-        @Override
-        public void onDrawerClosed(View drawerView) {
-            if (mDrawerToggle != null) mDrawerToggle.onDrawerClosed(drawerView);
-            if (mItemToOpenWhenDrawerCloses >= 0) {
-                Bundle extras = ActivityOptions.makeCustomAnimation(
-                    ActionBarCastActivity.this, R.anim.fade_in, R.anim.fade_out).toBundle();
-
-                Class activityClass = null;
-                switch (mItemToOpenWhenDrawerCloses) {
-                    case R.id.navigation_allmusic:
-                        activityClass = MusicPlayerActivity.class;
-                        break;
-                    case R.id.navigation_playlists:
-                        activityClass = PlaceholderActivity.class;
-                        break;
-                }
-                if (activityClass != null) {
-                    startActivity(new Intent(ActionBarCastActivity.this, activityClass), extras);
-                    finish();
-                }
-            }
-        }
-
-        @Override
-        public void onDrawerStateChanged(int newState) {
-            if (mDrawerToggle != null) mDrawerToggle.onDrawerStateChanged(newState);
-        }
-
-        @Override
-        public void onDrawerSlide(View drawerView, float slideOffset) {
-            if (mDrawerToggle != null) mDrawerToggle.onDrawerSlide(drawerView, slideOffset);
-        }
-
-        @Override
-        public void onDrawerOpened(View drawerView) {
-            if (mDrawerToggle != null) mDrawerToggle.onDrawerOpened(drawerView);
-            if (getSupportActionBar() != null) getSupportActionBar()
-                    .setTitle(R.string.app_name);
-        }
-    };
 
     private final FragmentManager.OnBackStackChangedListener mBackStackChangedListener =
         new FragmentManager.OnBackStackChangedListener() {
@@ -275,7 +233,6 @@ public abstract class ActionBarCastActivity extends AppCompatActivity {
             // Create an ActionBarDrawerToggle that will handle opening/closing of the drawer:
             mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
                 mToolbar, R.string.open_content_drawer, R.string.close_content_drawer);
-            mDrawerLayout.setDrawerListener(mDrawerListener);
             populateDrawerItems(navigationView);
             setSupportActionBar(mToolbar);
             updateDrawerToggle();
@@ -292,15 +249,12 @@ public abstract class ActionBarCastActivity extends AppCompatActivity {
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
                         menuItem.setChecked(true);
-                        mItemToOpenWhenDrawerCloses = menuItem.getItemId();
                         mDrawerLayout.closeDrawers();
                         return true;
                     }
                 });
         if (MusicPlayerActivity.class.isAssignableFrom(getClass())) {
-            navigationView.setCheckedItem(R.id.navigation_allmusic);
         } else if (PlaceholderActivity.class.isAssignableFrom(getClass())) {
-            navigationView.setCheckedItem(R.id.navigation_playlists);
         }
     }
 

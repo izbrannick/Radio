@@ -295,17 +295,23 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
                             i++;
 
-                            getMusicSession().setMetadata(new MediaMetadataCompat.Builder()
-                                    .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, currentSongID)
-                                    .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, MusicProviderSource.metadataList.get(songListSize).getAlbum())
-                                    .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, MusicProviderSource.metadataList.get(songListSize).getArtist())
-                                    .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, Long.parseLong(MusicProviderSource.metadataList.get(songListSize).getDuration()))
-                                    .putString(MediaMetadataCompat.METADATA_KEY_GENRE, "Mere end bare musik")
-                                    .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, pictureRoot + pictureName)
-                                    .putString(MediaMetadataCompat.METADATA_KEY_TITLE, MusicProviderSource.metadataList.get(songListSize).getTitle())
-                                    .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, i)
-                                    .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, 99)
-                                    .build());
+                            try {
+                                getMusicSession().setMetadata(new MediaMetadataCompat.Builder()
+                                        .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, currentSongID)
+                                        .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, MusicProviderSource.metadataList.get(songListSize).getAlbum())
+                                        .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, MusicProviderSource.metadataList.get(songListSize).getArtist())
+                                        .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, Long.parseLong(MusicProviderSource.metadataList.get(songListSize).getDuration()))
+                                        .putString(MediaMetadataCompat.METADATA_KEY_GENRE, "Mere end bare musik")
+                                        .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, pictureRoot + pictureName)
+                                        .putString(MediaMetadataCompat.METADATA_KEY_TITLE, MusicProviderSource.metadataList.get(songListSize).getTitle())
+                                        .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, i)
+                                        .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, 99)
+                                        .build());
+                            }
+                            catch (Exception e)
+                            {
+                                LogHelper.e("KNR", "Failed setting metadata", e);
+                            }
                         }
                     }
                     handler.postDelayed(this, 10000); // now is every 1 minutes
