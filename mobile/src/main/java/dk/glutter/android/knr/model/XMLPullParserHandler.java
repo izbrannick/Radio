@@ -36,7 +36,7 @@ public class XMLPullParserHandler {
 
             int eventType = parser.getEventType();
             while (eventType != XmlPullParser.END_DOCUMENT) {
-                String tagname = parser.getName().replaceAll("(&[^\\s]+?;)", "");
+                String tagname = parser.getName();
                 switch (eventType) {
                     case XmlPullParser.START_TAG:
                         if (tagname.equalsIgnoreCase("item")) {
