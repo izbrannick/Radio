@@ -56,8 +56,6 @@ public class RemoteJSONSource implements MusicProviderSource {
     public Iterator<MediaMetadataCompat> iterator() {
         try {
             getXmlFromUrl(URL);
-            //run();
-
 
             int slashPos = CATALOG_URL.lastIndexOf('/');
             String path = CATALOG_URL.substring(0, slashPos + 1);
@@ -263,16 +261,9 @@ public class RemoteJSONSource implements MusicProviderSource {
             if (result != null)
             {
                 try{
-                    if (currentSongID.equals("none"))
-                    {
-                        LogHelper.e("onPostExecute", "none");
-
-                        currentSongID = result.getId();
-                        metadataList.add(result);
-                    }
                     if (!currentSongID.equals(result.getId()) )
                     {
-                        LogHelper.e("onPostExecute", "result.getId()", result.getId());
+                        LogHelper.i("onPostExecute", "result.getId() = ", result.getId() + "and currentSongID = " + currentSongID);
 
                         currentSongID = result.getId();
                         metadataList.add(result);
@@ -282,7 +273,7 @@ public class RemoteJSONSource implements MusicProviderSource {
                     LogHelper.e("onPostExecute", "try1 Exception", result.getId());
                 }
                 try {
-                    LogHelper.e("onPostExecute", "getXmlFromUrl(URL)", "Tryning...");
+                    //LogHelper.e("onPostExecute", "getXmlFromUrl(URL)", "Tryning...");
                     getXmlFromUrl(URL);
                     return;
                 }catch (Exception e)

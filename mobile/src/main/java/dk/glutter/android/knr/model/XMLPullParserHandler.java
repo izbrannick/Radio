@@ -36,7 +36,7 @@ public class XMLPullParserHandler {
 
             int eventType = parser.getEventType();
             while (eventType != XmlPullParser.END_DOCUMENT) {
-                String tagname = parser.getName();
+                String tagname = parser.getName().replaceAll("(&[^\\s]+?;)", "");
                 switch (eventType) {
                     case XmlPullParser.START_TAG:
                         if (tagname.equalsIgnoreCase("item")) {
@@ -46,7 +46,7 @@ public class XMLPullParserHandler {
                         break;
 
                     case XmlPullParser.TEXT:
-                        text = parser.getText();
+                        text = parser.getText().replaceAll("(&[^\\s]+?;)", "");//TODO: verify if this works.... XML should contain this chars:(&[^\s]+?;)
                         break;
                     case XmlPullParser.END_TAG:
                         if (tagname.equalsIgnoreCase("item")) {

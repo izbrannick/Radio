@@ -24,7 +24,7 @@ public class LogHelper {
     private static final String LOG_PREFIX = "knr_";
     private static final int LOG_PREFIX_LENGTH = LOG_PREFIX.length();
     private static final int MAX_LOG_TAG_LENGTH = 23;
-    public static final boolean logIsEnabled = false;
+    public static final boolean logIsEnabled = true;
 
     public static String makeLogTag(String str) {
         if (str.length() > MAX_LOG_TAG_LENGTH - LOG_PREFIX_LENGTH) {
