@@ -289,39 +289,35 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
                         if (!MusicProviderSource.metadataList.get(songListSize).getTitle().equals(currentSongTitle)) {
                             LogHelper.i("KNR", "currentSOng = ", "equals this: " + currentSongID);
-                            currentSongID = "101"+i;
+                            currentSongID = "101" + i;
                             currentSongTitle = MusicProviderSource.metadataList.get(songListSize).getTitle();
 
-                            if (!MusicProviderSource.metadataList.get(songListSize).getTitle().equals("Kristen Net Radio")) {
-                                //currentSongID = MusicProviderSource.metadataList.get(songListSize).getId();
+                            if (MusicProviderSource.metadataList.get(songListSize).getPicture() == null)
+                                pictureName = MusicProviderSource.metadataList.get(songListSize).getPicture();
+                            else pictureName = "netradio.jpeg";
 
-                                if (MusicProviderSource.metadataList.get(songListSize).getPicture() == null)
-                                    pictureName = MusicProviderSource.metadataList.get(songListSize).getPicture();
-                                else pictureName = "netradio.jpeg";
+                            i++;
 
-                                i++;
+                            try {
+                                metaDataBuild = new MediaMetadataCompat.Builder()
+                                        .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, currentSongID)
+                                        .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, MusicProviderSource.metadataList.get(songListSize).getAlbum())
+                                        .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, MusicProviderSource.metadataList.get(songListSize).getArtist())
+                                        .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, Long.parseLong(MusicProviderSource.metadataList.get(songListSize).getDuration()))
+                                        .putString(MediaMetadataCompat.METADATA_KEY_GENRE, "Mere end bare musik")
+                                        .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, pictureRoot + pictureName)
+                                        .putString(MediaMetadataCompat.METADATA_KEY_TITLE, MusicProviderSource.metadataList.get(songListSize).getTitle())
+                                        .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, i)
+                                        .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, 99)
+                                        .build();
 
-                                try {
-                                    metaDataBuild = new MediaMetadataCompat.Builder()
-                                            .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, currentSongID)
-                                            .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, MusicProviderSource.metadataList.get(songListSize).getAlbum())
-                                            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, MusicProviderSource.metadataList.get(songListSize).getArtist())
-                                            .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, Long.parseLong(MusicProviderSource.metadataList.get(songListSize).getDuration()))
-                                            .putString(MediaMetadataCompat.METADATA_KEY_GENRE, "Mere end bare musik")
-                                            .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, pictureRoot + pictureName)
-                                            .putString(MediaMetadataCompat.METADATA_KEY_TITLE, MusicProviderSource.metadataList.get(songListSize).getTitle())
-                                            .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, i)
-                                            .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, 99)
-                                            .build();
-
-                                } catch (Exception e) {
-                                    LogHelper.e("KNR", "Failed building metadata", e);
-                                }
-                                try {
-                                    getMusicSession().setMetadata(metaDataBuild);
-                                } catch (Exception e) {
-                                    LogHelper.e("KNR", "Failed setting metadata", e);
-                                }
+                            } catch (Exception e) {
+                                LogHelper.e("KNR", "Failed building metadata", e);
+                            }
+                            try {
+                                getMusicSession().setMetadata(metaDataBuild);
+                            } catch (Exception e) {
+                                LogHelper.e("KNR", "Failed setting metadata", e);
                             }
                         }
                     }

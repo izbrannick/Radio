@@ -11,6 +11,8 @@ import org.xmlpull.v1.XmlPullParserFactory;
 import java.io.IOException;
 import java.io.InputStream;
 
+import dk.glutter.android.knr.utils.LogHelper;
+
 /**
  * Created by U321424 on 08-03-2016.
  */
@@ -29,14 +31,24 @@ public class XMLPullParserHandler {
         try {
             item = new Item();
 
+            LogHelper.i("KNR", "XmlParser started ");
+
             factory = XmlPullParserFactory.newInstance();
             factory.setNamespaceAware(true);
             parser = factory.newPullParser();
-            parser.setInput(is, null);
+
+            parser.setInput(is, "utf-8");
 
             int eventType = parser.getEventType();
             while (eventType != XmlPullParser.END_DOCUMENT) {
                 String tagname = parser.getName();
+
+
+                LogHelper.i("KNR", "XmlParser tagname ", tagname);
+
+                tagname = tagname.replaceAll("(&[^\\s]+?;)", "");
+                LogHelper.i("KNR", "XmlParser cleaning tagname for chars ", tagname);
+
                 switch (eventType) {
                     case XmlPullParser.START_TAG:
                         if (tagname.equalsIgnoreCase("item")) {
@@ -47,6 +59,7 @@ public class XMLPullParserHandler {
 
                     case XmlPullParser.TEXT:
                         text = parser.getText().replaceAll("(&[^\\s]+?;)", "");//TODO: verify if this works.... XML should contain this chars:(&[^\s]+?;)
+                        LogHelper.i("KNR", "XmlText ", text);
                         break;
                     case XmlPullParser.END_TAG:
                         if (tagname.equalsIgnoreCase("item")) {
@@ -78,9 +91,9 @@ public class XMLPullParserHandler {
                 eventType = parser.next();
             }
         } catch (XmlPullParserException e) {
-            e.printStackTrace();
+            LogHelper.i("KNR", "XmlPullParserException ", e);
         } catch (IOException e) {
-            e.printStackTrace();
+            LogHelper.i("KNR", "Xml IOException ", e);
         }
 
         return item;
