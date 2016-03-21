@@ -13,27 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package dk.glutter.android.knr.playback;
+
+package dk.glutter.android.knr.model;
 
 import android.support.v4.media.MediaMetadataCompat;
-import android.support.v4.media.session.MediaSessionCompat;
 
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
 
-public class SimpleMetadataUpdateListener implements QueueManager.MetadataUpdateListener{
-    @Override
-    public void onMetadataChanged(MediaMetadataCompat metadata) {
-    }
-
-    @Override
-    public void onMetadataRetrieveError() {
-    }
-
-    @Override
-    public void onCurrentQueueIndexUpdated(int queueIndex) {
-    }
-
-    @Override
-    public void onQueueUpdated(String title, List<MediaSessionCompat.QueueItem> newQueue) {
-    }
+public interface MusicProviderSource {
+    String CUSTOM_METADATA_TRACK_SOURCE = "__SOURCE__";
+    Iterator<MediaMetadataCompat> iterator();
+    ArrayList<Item> metadataList = new ArrayList<>();
 }
