@@ -97,6 +97,7 @@ public class RemoteJSONSource implements MusicProviderSource {
         // Starts the query
         conn.connect();
         InputStream stream = conn.getInputStream();
+
         return stream;
     }
 
@@ -121,17 +122,17 @@ public class RemoteJSONSource implements MusicProviderSource {
 
 
     private MediaMetadataCompat buildFromJSON(JSONObject json, String basePath) throws JSONException {
-        TITLE = json.getString(XML_TITLE);
-        ALBUM = json.getString(XML_ALBUM);
-        ARTIST = json.getString(XML_ARTIST);
-        GENRE = json.getString(XML_GENRE);
-        SOURCE = "http://lyt.kristennetradio.dk:8000";
-        IMAGE = json.getString(XML_IMAGE);
-        TRACK_NUMBER = json.getInt(XML_TRACK_NUMBER);
-        int totalTrackCount = json.getInt(XML_TOTAL_TRACK_COUNT);
-        DURATION = json.getInt(XML_DURATION) * 1000; // ms
 
-        LogHelper.d(TAG, "Found music track: ", json);
+        TITLE = "Kristen Net Radio";
+        ALBUM = "Mere end bare musik";
+        ARTIST = "KNR";
+        GENRE = "Mere end bare musik";
+        SOURCE = "http://lyt.kristennetradio.dk:8000";
+        IMAGE = "http://kristennetradio.dk/SBC/samHTMweb/pictures/netradio.jpeg";
+        TRACK_NUMBER = 1;
+        DURATION = 20000; // ms
+
+        LogHelper.c(1, "buildFromJSON" , "Found music track: ", json.toString());
 
         // Media is stored relative to JSON file
         if (!SOURCE.startsWith("http")) {
@@ -143,19 +144,6 @@ public class RemoteJSONSource implements MusicProviderSource {
         // Since we don't have a unique ID in the server, we fake one using the hashcode of
         // the music source. In a real world app, this could come from the server.
         String id = String.valueOf(SOURCE.hashCode());
-
-        if (metadataList.size() > 0) {
-            int lastIndex = metadataList.size() - 1;
-            TITLE = metadataList.get(lastIndex).getTitle();
-            ALBUM = metadataList.get(lastIndex).getAlbum();
-            ARTIST = metadataList.get(lastIndex).getArtist();
-
-            //SOURCE = "http://lyt.kristennetradio.dk:8000";
-            String pictureRoot = "http://kristennetradio.dk/SBC/samHTMweb/pictures/";
-            IMAGE = pictureRoot + metadataList.get(lastIndex).getPicture(); //TODO: add picture root
-            //TRACK_NUMBER = json.getInt(XML_TRACK_NUMBER);
-            DURATION = Long.parseLong(metadataList.get(lastIndex).getDuration());
-        }
 
         // Adding the music source to the MediaMetadata (and consequently using it in the
         // mediaSession.setMetadata) is not a good idea for a real world music app, because
@@ -172,7 +160,6 @@ public class RemoteJSONSource implements MusicProviderSource {
                 .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, IMAGE)
                 .putString(MediaMetadataCompat.METADATA_KEY_TITLE, TITLE)
                 .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, TRACK_NUMBER)
-                .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, totalTrackCount)
                 .build();
     }
 
@@ -263,27 +250,25 @@ public class RemoteJSONSource implements MusicProviderSource {
                 try{
                     if (!currentSongID.equals(result.getId()) )
                     {
-                        LogHelper.i("onPostExecute", "result.getId() = ", result.getId() + "and currentSongID = " + currentSongID);
+                        LogHelper.e("onPostExecute", "result.getId() = ", result.getId() + "and currentSongID = " + currentSongID);
 
                         currentSongID = result.getId();
                         metadataList.add(result);
                     }
                 }catch (Exception e)
                 {
-                    LogHelper.e("onPostExecute", "try1 Exception", result.getId());
+                    LogHelper.c(1, "onPostExecute", "try1 Exception: ", result.getId());
                 }
                 try {
-                    //LogHelper.e("onPostExecute", "getXmlFromUrl(URL)", "Tryning...");
-                    getXmlFromUrl(URL);
+                    //getXmlFromUrl(URL);
                     return;
                 }catch (Exception e)
                 {
-                    LogHelper.e("onPostExecute", "getXmlFromUrl(URL)", e);
+                    LogHelper.c(1, "onPostExecute", "getXmlFromUrl(URL)", e.getMessage());
                 }
             }
         }
     }
-
 
     Runnable runnable = null;
     Handler handler;
@@ -298,7 +283,7 @@ public class RemoteJSONSource implements MusicProviderSource {
             runnable = new Runnable() {
                 public void run() {
 
-                    LogHelper.e("onPostExecute", "RUN()", "Running....");
+                    LogHelper.c(1, "onPostExecute", "RUN()", "Running....");
                     getXmlFromUrl(URL);
                     handler.postDelayed(this, 1000); // now is every 1 minutes
                 }
