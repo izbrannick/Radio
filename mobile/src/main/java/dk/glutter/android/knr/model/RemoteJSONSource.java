@@ -260,7 +260,7 @@ public class RemoteJSONSource implements MusicProviderSource {
                     LogHelper.c(1, "onPostExecute", "try1 Exception: ", result.getId());
                 }
                 try {
-                    //getXmlFromUrl(URL);
+                    getXmlFromUrl(URL);
                     return;
                 }catch (Exception e)
                 {
