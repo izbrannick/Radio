@@ -299,8 +299,8 @@ public class MusicService extends MediaBrowserServiceCompat implements
                             try {
                                 metaDataBuild = new MediaMetadataCompat.Builder()
                                         .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, currentSongID)
-                                        .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, arrayListSize +" " +  MusicProviderSource.metadataList.get(lastSongInList).getAlbum())
-                                        .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, arrayListSize +" " +  MusicProviderSource.metadataList.get(lastSongInList).getArtist())
+                                        .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, MusicProviderSource.metadataList.get(lastSongInList).getAlbum())
+                                        .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, MusicProviderSource.metadataList.get(lastSongInList).getArtist())
                                         .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, Long.parseLong(MusicProviderSource.metadataList.get(lastSongInList).getDuration()))
                                         .putString(MediaMetadataCompat.METADATA_KEY_GENRE, "Mere end bare musik")
                                         .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, pictureRoot + pictureName)

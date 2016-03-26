@@ -4,11 +4,8 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v4.media.MediaMetadataCompat;
 
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -31,6 +28,8 @@ public class RemoteJSONSource implements MusicProviderSource {
 
     protected static final String URL =
             "http://kristennetradio.dk/scripts/getCurrentSong.php";
+
+    protected static final String STREAM_URL = "http://lyt.kristennetradio.dk:8000/;";
 
     private static String XML_MUSIC = "music";
     private static String XML_TITLE = "title";
@@ -57,21 +56,11 @@ public class RemoteJSONSource implements MusicProviderSource {
         try {
             getXmlFromUrl(URL);
 
-            int slashPos = CATALOG_URL.lastIndexOf('/');
-            String path = CATALOG_URL.substring(0, slashPos + 1);
-            JSONObject jsonObj = fetchJSONFromUrl();
             ArrayList<MediaMetadataCompat> tracks = new ArrayList<>();
-            if (jsonObj != null) {
-                JSONArray jsonTracks = jsonObj.getJSONArray(XML_MUSIC);
+            tracks.add(bliuldFirstMusicList());
 
-                if (jsonTracks != null) {
-                    for (int j = 0; j < jsonTracks.length(); j++) {
-                        tracks.add(buildFromJSON(jsonTracks.getJSONObject(j), path));
-                    }
-                }
-            }
             return tracks.iterator();
-        } catch (JSONException e) {
+        } catch (Exception e) {
             LogHelper.e(TAG, e, "Could not retrieve music list");
             throw new RuntimeException("Could not retrieve music list", e);
         }
@@ -121,26 +110,17 @@ public class RemoteJSONSource implements MusicProviderSource {
     }
 
 
-    private MediaMetadataCompat buildFromJSON(JSONObject json, String basePath) throws JSONException {
+    private MediaMetadataCompat bliuldFirstMusicList() throws JSONException {
 
         TITLE = "Kristen Net Radio";
         ALBUM = "Mere end bare musik";
         ARTIST = "KNR";
         GENRE = "Mere end bare musik";
-        SOURCE = "http://lyt.kristennetradio.dk:8000";
+        SOURCE = STREAM_URL;
         IMAGE = "http://kristennetradio.dk/SBC/samHTMweb/pictures/netradio.jpeg";
         TRACK_NUMBER = 1;
         DURATION = 20000; // ms
 
-        LogHelper.c(1, "buildFromJSON" , "Found music track: ", json.toString());
-
-        // Media is stored relative to JSON file
-        if (!SOURCE.startsWith("http")) {
-            SOURCE = basePath + SOURCE;
-        }
-        if (!IMAGE.startsWith("http")) {
-            IMAGE = basePath + IMAGE;
-        }
         // Since we don't have a unique ID in the server, we fake one using the hashcode of
         // the music source. In a real world app, this could come from the server.
         String id = String.valueOf(SOURCE.hashCode());
@@ -161,70 +141,6 @@ public class RemoteJSONSource implements MusicProviderSource {
                 .putString(MediaMetadataCompat.METADATA_KEY_TITLE, TITLE)
                 .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, TRACK_NUMBER)
                 .build();
-    }
-
-
-    private String jsonString="{\"music\" : [ {\n" +
-            "\"title\" : \"Kristen Net Radio\",\n" +
-            "\"album\" : \"Mere end bare musik\",\n" +
-            "\"artist\" : \"KNR\",\n" +
-            "\"genre\" : \"Mere end bare musik\",\n" +
-            "\"source\" : \"http://lyt.kristennetradio.dk:8000\",\n" +
-            "\"image\" : \"http://kristennetradio.dk/SBC/samHTMweb/pictures/netradio.jpeg\",\n" +
-            "\"trackNumber\" : 1,\n" +
-            "\"totalTrackCount\" : 6,\n" +
-            "\"duration\" : 103,\n" +
-            "\"site\" : \"http://lyt.kristennetradio.dk:8000\"\n" +
-            "},\n" +
-            "{ \"title\" : \"Kristen Net Radio\",\n" +
-            "\"album\" : \"Mere end bare musik\",\n" +
-            "\"artist\" : \"KNR\",\n" +
-            "\"genre\" : \"Mere end bare musik\",\n" +
-            "\"source\" : \"http://lyt.kristennetradio.dk:8000\",\n" +
-            "\"image\" : \"http://kristennetradio.dk/SBC/samHTMweb/pictures/netradio.jpeg\",\n" +
-            "\"trackNumber\" : 2,\n" +
-            "\"totalTrackCount\" : 6,\n" +
-            "\"duration\" : 132,\n" +
-            "\"site\" : \"http://lyt.kristennetradio.dk:8000\"\n" +
-            "},\n" +
-            "{ \"title\" : \"Kristen Net Radio\",\n" +
-            "\"album\" : \"Mere end bare musik\",\n" +
-            "\"artist\" : \"KNR\",\n" +
-            "\"genre\" : \"Mere end bare musik\",\n" +
-            "\"source\" : \"http://lyt.kristennetradio.dk:8000\",\n" +
-            "\"image\" : \"http://kristennetradio.dk/SBC/samHTMweb/pictures/netradio.jpeg\",\n" +
-            "\"trackNumber\" : 3,\n" +
-            "\"totalTrackCount\" : 6,\n" +
-            "\"duration\" : 132,\n" +
-            "\"site\" : \"http://lyt.kristennetradio.dk:8000\"\n" +
-            "}\n" +
-            "]}";
-
-    /**
-     * Download a JSON file from a server, parse the content and return the JSON
-     * object.
-     *
-     * @return result JSONObject containing the parsed representation.
-     */
-    private JSONObject fetchJSONFromUrl() throws JSONException {
-        BufferedReader reader = null;
-        try {
-            //TODO: add json from xml
-            return new JSONObject(jsonString);
-        } catch (JSONException e) {
-            throw e;
-        } catch (Exception e) {
-            LogHelper.e(TAG, "Failed to parse the json for media list", e);
-            return null;
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    // ignore
-                }
-            }
-        }
     }
 
     String currentSongID = "none";
@@ -260,8 +176,8 @@ public class RemoteJSONSource implements MusicProviderSource {
                     LogHelper.c(1, "onPostExecute", "try1 Exception: ", result.getId());
                 }
                 try {
-                    getXmlFromUrl(URL);
-                    return;
+                    //getXmlFromUrl(URL);
+                    run();
                 }catch (Exception e)
                 {
                     LogHelper.c(1, "onPostExecute", "getXmlFromUrl(URL)", e.getMessage());

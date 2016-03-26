@@ -13,6 +13,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CodingErrorAction;
 
 import dk.glutter.android.knr.utils.LogHelper;
 
@@ -51,14 +57,10 @@ public class XMLPullParserHandler {
 
 
             String str = total.toString();
-            str = str.replaceAll("(&[^s]+;�%)", "");
-            str = str.replace("&", "");
-            str = str.replace("�", "");
-            str = str.replace("_", "");
-            str = str.replace("(", "");
-            str = str.replace(")", "");
 
 
+            // str = replaceBadCharacterOneByOne(str);
+            str = encodeThenDecode(str);
             StringReader strReader = new StringReader(str);
 
 
@@ -124,5 +126,61 @@ public class XMLPullParserHandler {
 
         return item;
     }
+
+
+
+    private String cleanBadChars(String str) throws InterruptedException, CharacterCodingException {
+                CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
+                decoder.onMalformedInput(CodingErrorAction.REPLACE);
+                decoder.onUnmappableCharacter(CodingErrorAction.REPLACE);
+                ByteBuffer bb = ByteBuffer.wrap(new byte[]{
+                        (byte) 0xD0, (byte) 0x9F, // 'П'
+                        (byte) 0xD1, (byte) 0x80, // 'р'
+                        (byte) 0xD0,              // corrupted UTF-8, was 'и'
+                        (byte) 0xD0, (byte) 0xB2, // 'в'
+                        (byte) 0xD0, (byte) 0xB5, // 'е'
+                        (byte) 0xD1, (byte) 0x82  // 'т'
+                });
+                CharBuffer parsed = decoder.decode(bb);
+                System.out.println(parsed);
+                // this prints: Пр?вет
+
+        return parsed.toString();
+    }
+
+    private String encodeThenDecode(String str)
+    {
+
+        Charset charset = Charset.forName("UTF-8");
+        str = charset.decode(charset.encode(str)).toString();
+
+        return str;
+    }
+
+    private String replaceBadCharactersOneByOne(String str)
+    {
+
+        str = str.replaceAll("(&[^s]+;�%)", "");
+        str = str.replace("&", "");
+        str = str.replace("�", "");
+        str = str.replace("_", "");
+        str = str.replace("(", "");
+        str = str.replace(")", "");
+        str = str.replace("[", "");
+        str = str.replace("]", "");
+
+
+        /*
+        if (str.regionMatches(true, 37, "<content><item><id>",38, 18))
+            LogHelper.e("string", "MATCHES");
+        if (str.regionMatches(true, 38, "<content><item><id>",39, 18))
+            LogHelper.e("string", "MATCHES_II");
+        */
+
+
+        return str;
+
+    }
+
 
 }

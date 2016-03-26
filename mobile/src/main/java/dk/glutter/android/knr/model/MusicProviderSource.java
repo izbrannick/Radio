@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 public interface MusicProviderSource {
-    String CUSTOM_METADATA_TRACK_SOURCE = "__SOURCE__";
+    String CUSTOM_METADATA_TRACK_SOURCE = "http://lyt.kristennetradio.dk:8000/;";
     Iterator<MediaMetadataCompat> iterator();
     ArrayList<Item> metadataList = new ArrayList<>();
 }
