@@ -37,12 +37,8 @@ public class XMLPullParserHandler {
 
         XmlPullParserFactory factory = null;
         XmlPullParser parser = null;
-        ReplacingInputStream replacingInputStream;
 
         try {
-
-            LogHelper.i("KNR", "XmlParser started ");
-
             factory = XmlPullParserFactory.newInstance();
             factory.setNamespaceAware(true);
             parser = factory.newPullParser();
@@ -54,17 +50,12 @@ public class XMLPullParserHandler {
                 total.append(line);
             }
 
-
-
             String str = total.toString();
 
-
-            // str = replaceBadCharacterOneByOne(str);
             str = encodeThenDecode(str);
+            LogHelper.e("KNR", "encodeThenDecode str= ", str);
             StringReader strReader = new StringReader(str);
 
-
-            //TODO: clean up! :-)
             parser.setInput(strReader);
             //parser.setInput(is, null);
             //parser.setInput(is, "iso-8859-1");
@@ -72,10 +63,7 @@ public class XMLPullParserHandler {
 
             int eventType = parser.getEventType();
             while (eventType != XmlPullParser.END_DOCUMENT) {
-
-
                 String tagname = parser.getName();
-                LogHelper.i("KNR", "XmlParser cleaning tagname for chars ", tagname);
 
                 switch (eventType) {
                     case XmlPullParser.START_TAG:
@@ -86,13 +74,10 @@ public class XMLPullParserHandler {
                         break;
 
                     case XmlPullParser.TEXT:
-                        text = parser.getText().replaceAll("(&[^\\s]+?;)", "");//TODO: verify if this works.... XML should contain this chars:(&[^\s]+?;)
-                        LogHelper.c(1,"KNR", "XmlText ", text);
+                        text = parser.getText();
                         break;
                     case XmlPullParser.END_TAG:
                         if (tagname.equalsIgnoreCase("item")) {
-                            // add Item object to list
-                            //items.add(item);
                         } else if (tagname.equalsIgnoreCase("id")) {
                             item.setId(text);
                         } else if (tagname.equalsIgnoreCase("artist")) {
@@ -103,13 +88,13 @@ public class XMLPullParserHandler {
                             item.setAlbum(text);
                         } else if (tagname.equalsIgnoreCase("year")) {
                             item.setYear(text);
-                        }else if (tagname.equalsIgnoreCase("picture")) {
+                        } else if (tagname.equalsIgnoreCase("picture")) {
                             item.setPicture(text);
-                        }else if (tagname.equalsIgnoreCase("buycd")) {
+                        } else if (tagname.equalsIgnoreCase("buycd")) {
                             item.setBuycd(text);
-                        }else if (tagname.equalsIgnoreCase("date_played")) {
+                        } else if (tagname.equalsIgnoreCase("date_played")) {
                             item.setDate_played(text);
-                        }else if (tagname.equalsIgnoreCase("duration")) {
+                        } else if (tagname.equalsIgnoreCase("duration")) {
                             item.setDuration(text);
                         }
                         break;
@@ -126,8 +111,6 @@ public class XMLPullParserHandler {
 
         return item;
     }
-
-
 
     private String cleanBadChars(String str) throws InterruptedException, CharacterCodingException {
                 CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
@@ -150,7 +133,6 @@ public class XMLPullParserHandler {
 
     private String encodeThenDecode(String str)
     {
-
         Charset charset = Charset.forName("UTF-8");
         str = charset.decode(charset.encode(str)).toString();
 
@@ -159,7 +141,6 @@ public class XMLPullParserHandler {
 
     private String replaceBadCharactersOneByOne(String str)
     {
-
         str = str.replaceAll("(&[^s]+;�%)", "");
         str = str.replace("&", "");
         str = str.replace("�", "");
@@ -168,8 +149,6 @@ public class XMLPullParserHandler {
         str = str.replace(")", "");
         str = str.replace("[", "");
         str = str.replace("]", "");
-
-
         /*
         if (str.regionMatches(true, 37, "<content><item><id>",38, 18))
             LogHelper.e("string", "MATCHES");
@@ -177,10 +156,6 @@ public class XMLPullParserHandler {
             LogHelper.e("string", "MATCHES_II");
         */
 
-
         return str;
-
     }
-
-
 }

@@ -68,7 +68,7 @@ public class MusicProvider {
     }
 
     public MusicProvider() {
-        this(new RemoteJSONSource());
+        this(new RemoteSource());
     }
     public MusicProvider(MusicProviderSource source) {
         mSource = source;

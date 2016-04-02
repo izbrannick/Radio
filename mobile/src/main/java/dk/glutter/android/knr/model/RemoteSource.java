@@ -1,10 +1,7 @@
 package dk.glutter.android.knr.model;
 
 import android.os.AsyncTask;
-import android.os.Handler;
 import android.support.v4.media.MediaMetadataCompat;
-
-import org.json.JSONException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,28 +16,14 @@ import dk.glutter.android.knr.utils.LogHelper;
  * Utility class to get a list of MusicTrack's based on a server-side JSON
  * configuration.
  */
-public class RemoteJSONSource implements MusicProviderSource {
+public class RemoteSource implements MusicProviderSource {
 
-    private static final String TAG = LogHelper.makeLogTag(RemoteJSONSource.class);
-
-    protected static final String CATALOG_URL =
-            "http://private-a6f03-knr.apiary-mock.com/questions";
+    private static final String TAG = LogHelper.makeLogTag(RemoteSource.class);
 
     protected static final String URL =
             "http://kristennetradio.dk/scripts/getCurrentSong.php";
 
     protected static final String STREAM_URL = "http://lyt.kristennetradio.dk:8000/;";
-
-    private static String XML_MUSIC = "music";
-    private static String XML_TITLE = "title";
-    private static String XML_ALBUM = "album";
-    private static String XML_ARTIST = "artist";
-    private static String XML_GENRE = "genre";
-    private static String XML_SOURCE = "source";
-    private static String XML_IMAGE = "image";
-    private static String XML_TRACK_NUMBER = "trackNumber";
-    private static String XML_TOTAL_TRACK_COUNT = "totalTrackCount";
-    private static String XML_DURATION = "duration";
 
     private static String TITLE = "title";
     private static String ALBUM = "album";
@@ -67,6 +50,8 @@ public class RemoteJSONSource implements MusicProviderSource {
     }
 
     public void getXmlFromUrl(String url) {
+        LogHelper.e("...getXmlFromUrl...", "ZZZZZZZZZZZZZZ");
+
         try {
             new DownloadXmlTask().execute(url);
         } catch (Exception e) {
@@ -110,7 +95,7 @@ public class RemoteJSONSource implements MusicProviderSource {
     }
 
 
-    private MediaMetadataCompat bliuldFirstMusicList() throws JSONException {
+    private MediaMetadataCompat bliuldFirstMusicList(){
 
         TITLE = "Kristen Net Radio";
         ALBUM = "Mere end bare musik";
@@ -151,7 +136,6 @@ public class RemoteJSONSource implements MusicProviderSource {
         @Override
         protected Item doInBackground(String... urls) {
             try {
-
                 return GetXML(urls[0]);
             } catch (Exception e) {
                  e.getMessage();
@@ -166,9 +150,11 @@ public class RemoteJSONSource implements MusicProviderSource {
                 try{
                     if (!currentSongID.equals(result.getId()) )
                     {
-                        LogHelper.e("onPostExecute", "result.getId() = ", result.getId() + "and currentSongID = " + currentSongID);
+                        LogHelper.i("onPostExecute", "result.getId() = ", result.getId() + " and currentSongID = " + currentSongID);
 
                         currentSongID = result.getId();
+                        if (metadataList.size() > 20)
+                            metadataList.removeAll(metadataList);
                         metadataList.add(result);
                     }
                 }catch (Exception e)
@@ -176,8 +162,7 @@ public class RemoteJSONSource implements MusicProviderSource {
                     LogHelper.c(1, "onPostExecute", "try1 Exception: ", result.getId());
                 }
                 try {
-                    //getXmlFromUrl(URL);
-                    run();
+                    //run();
                 }catch (Exception e)
                 {
                     LogHelper.c(1, "onPostExecute", "getXmlFromUrl(URL)", e.getMessage());
@@ -186,26 +171,28 @@ public class RemoteJSONSource implements MusicProviderSource {
         }
     }
 
-    Runnable runnable = null;
-    Handler handler;
+    /*
+    Runnable rnbl = null;
+    Handler hndlr;
     private void run()
     {
-        if(runnable != null)
-            handler.removeCallbacks(runnable);
+        if(rnbl != null)
+            hndlr.removeCallbacks(rnbl);
 
-        if(handler == null) {
-            handler = new Handler();
+        if(hndlr == null) {
+            hndlr = new Handler();
 
-            runnable = new Runnable() {
+            rnbl = new Runnable() {
                 public void run() {
 
-                    LogHelper.c(1, "onPostExecute", "RUN()", "Running....");
+                    LogHelper.i("onPostExecute", "RUN()", "Running....");
                     getXmlFromUrl(URL);
-                    handler.postDelayed(this, 1000); // now is every 1 minutes
+                    hndlr.postDelayed(this, 3000);
                 }
             };
-            handler.postDelayed(runnable , 1000); // Every 120000 ms (2 minutes)
+            hndlr.postDelayed(rnbl , 3000);
         }
-
     }
+
+    */
 }
