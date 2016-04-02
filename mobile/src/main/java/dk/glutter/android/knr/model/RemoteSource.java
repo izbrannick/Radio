@@ -147,16 +147,10 @@ public class RemoteSource implements MusicProviderSource {
         protected void onPostExecute(Item result) {
             if (result != null)
             {
-                try{
-                    if (!currentSongID.equals(result.getId()) )
-                    {
-                        LogHelper.i("onPostExecute", "result.getId() = ", result.getId() + " and currentSongID = " + currentSongID);
-
-                        currentSongID = result.getId();
-                        if (metadataList.size() > 20)
-                            metadataList.removeAll(metadataList);
-                        metadataList.add(result);
-                    }
+                try {
+                    if (metadataList.size() > 20)
+                        metadataList.removeAll(metadataList);
+                    metadataList.add(result);
                 }catch (Exception e)
                 {
                     LogHelper.c(1, "onPostExecute", "try1 Exception: ", result.getId());
