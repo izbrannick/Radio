@@ -108,7 +108,6 @@ public class XMLPullParserHandler {
         } catch (IOException e) {
             LogHelper.i("KNR", "Xml IOException ", e);
         }
-
         return item;
     }
 

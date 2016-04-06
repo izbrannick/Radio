@@ -23,6 +23,9 @@ import java.util.Iterator;
 
 public interface MusicProviderSource {
     String CUSTOM_METADATA_TRACK_SOURCE = "http://lyt.kristennetradio.dk:8000/;";
+
+    ArrayList<Item> items = new ArrayList<>();
+
     Iterator<MediaMetadataCompat> iterator();
-    ArrayList<Item> metadataList = new ArrayList<>();
 }
+

@@ -1,5 +1,7 @@
 package dk.glutter.android.knr.model;
 
+import java.util.ArrayList;
+
 /**
  * Created by luther on 12/03/2016.
  */
@@ -14,7 +16,16 @@ public class Item {
     private String buycd;
     private String date_played;
     private String duration;
+    private ArrayList<Item> items = new ArrayList<>();
 
+
+    public ArrayList<Item> getItems() {
+        return items;
+    }
+
+    public void addItems(Item item) {
+        items.add(item);
+    }
 
     public String getId() {
         return id;
@@ -93,5 +104,6 @@ public class Item {
         return artist + ": " + title + "\n" + album + "-" + year
                 + "\n" + duration;
     }
+
 }
 

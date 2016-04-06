@@ -10,6 +10,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import dk.glutter.android.knr.Constants;
 import dk.glutter.android.knr.utils.LogHelper;
 
 /**
@@ -20,25 +21,19 @@ public class RemoteSource implements MusicProviderSource {
 
     private static final String TAG = LogHelper.makeLogTag(RemoteSource.class);
 
-    protected static final String URL =
-            "http://kristennetradio.dk/scripts/getCurrentSong.php";
-
-    protected static final String STREAM_URL = "http://lyt.kristennetradio.dk:8000/;";
-
-    private static String TITLE = "title";
-    private static String ALBUM = "album";
-    private static String ARTIST = "artist";
-    private static String GENRE = "genre";
-    private static String SOURCE = "source";
-    private static String IMAGE = "image";
-    private static int TRACK_NUMBER = 0;
-    private static long DURATION = 0;
+    public static String ID = "0";
+    public static String TITLE = "title";
+    public static String ALBUM = "album";
+    public static String ARTIST = "artist";
+    public static String GENRE = "genre";
+    public static String SOURCE = "source";
+    public static String IMAGE = "image";
+    public static int TRACK_NUMBER = 0;
+    public static long DURATION = 0;
 
     @Override
     public Iterator<MediaMetadataCompat> iterator() {
         try {
-            getXmlFromUrl(URL);
-
             ArrayList<MediaMetadataCompat> tracks = new ArrayList<>();
             tracks.add(bliuldFirstMusicList());
 
@@ -49,6 +44,63 @@ public class RemoteSource implements MusicProviderSource {
         }
     }
 
+    private MediaMetadataCompat bliuldFirstMusicList(){
+
+        TITLE = Constants.DEFAULT_TITLE;
+        ALBUM = Constants.DEFAULT_ALBUM;
+        ARTIST = Constants.DEFAULT_ARTIST;
+        GENRE = Constants.DEFAULT_GENRE;
+        SOURCE = Constants.STREAM_URL;
+        IMAGE = Constants.IMAGE_ROOT + Constants.DEFAULT_IMAGE;
+        TRACK_NUMBER = Constants.DEFAULT_TRACK_NUMBER;
+        DURATION = Constants.IMAGE_DURATION;
+
+        // Since we don't have a unique ID in the server, we fake one using the hashcode of
+        // the music source. In a real world app, this could come from the server.
+        ID = String.valueOf(SOURCE.hashCode());
+
+        // Adding the music source to the MediaMetadata (and consequently using it in the
+        // mediaSession.setMetadata) is not a good idea for a real world music app, because
+        // the session metadata can be accessed by notification listeners. This is done in this
+        // sample for convenience only.
+        //noinspection ResourceType
+        return new MediaMetadataCompat.Builder()
+                .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, ID)
+                .putString(MusicProviderSource.CUSTOM_METADATA_TRACK_SOURCE, SOURCE)
+                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, ALBUM)
+                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, ARTIST)
+                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, DURATION)
+                .putString(MediaMetadataCompat.METADATA_KEY_GENRE, GENRE)
+                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, IMAGE)
+                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, TITLE)
+                .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, TRACK_NUMBER)
+                .build();
+    }
+/*
+    Runnable rnbl = null;
+    Handler hndlr;
+    public void run()
+    {
+        if(rnbl != null)
+            hndlr.removeCallbacks(rnbl);
+
+        if(hndlr == null) {
+            hndlr = new Handler();
+
+            rnbl = new Runnable() {
+                public void run() {
+
+                    LogHelper.i("RUN()", "getXmlFromUrl....");
+                    getXmlFromUrl(Constants.META_DATA_URL);
+                    hndlr.postDelayed(this, 10000);
+                }
+            };
+            hndlr.postDelayed(rnbl , 0);
+        }
+    }
+
+*/
+
     public void getXmlFromUrl(String url) {
         LogHelper.e("...getXmlFromUrl...", "ZZZZZZZZZZZZZZ");
 
@@ -57,12 +109,13 @@ public class RemoteSource implements MusicProviderSource {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 
     // Given a string representation of a URL, sets up a connection and gets
     // an input stream.
     private InputStream downloadUrl(String urlString) throws IOException {
-        URL url = new URL(urlString);
+        java.net.URL url = new URL(urlString);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setReadTimeout(10000 /* milliseconds */);
         conn.setConnectTimeout(15000 /* milliseconds */);
@@ -94,99 +147,57 @@ public class RemoteSource implements MusicProviderSource {
         }
     }
 
-
-    private MediaMetadataCompat bliuldFirstMusicList(){
-
-        TITLE = "Kristen Net Radio";
-        ALBUM = "Mere end bare musik";
-        ARTIST = "KNR";
-        GENRE = "Mere end bare musik";
-        SOURCE = STREAM_URL;
-        IMAGE = "http://kristennetradio.dk/SBC/samHTMweb/pictures/netradio.jpeg";
-        TRACK_NUMBER = 1;
-        DURATION = 20000; // ms
-
-        // Since we don't have a unique ID in the server, we fake one using the hashcode of
-        // the music source. In a real world app, this could come from the server.
-        String id = String.valueOf(SOURCE.hashCode());
-
-        // Adding the music source to the MediaMetadata (and consequently using it in the
-        // mediaSession.setMetadata) is not a good idea for a real world music app, because
-        // the session metadata can be accessed by notification listeners. This is done in this
-        // sample for convenience only.
-        //noinspection ResourceType
-        return new MediaMetadataCompat.Builder()
-                .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, id)
-                .putString(MusicProviderSource.CUSTOM_METADATA_TRACK_SOURCE, SOURCE)
-                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, ALBUM)
-                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, ARTIST)
-                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, DURATION)
-                .putString(MediaMetadataCompat.METADATA_KEY_GENRE, GENRE)
-                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, IMAGE)
-                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, TITLE)
-                .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, TRACK_NUMBER)
-                .build();
-    }
-
-    String currentSongID = "none";
+    public static boolean metaIsChanged = false;
 
     // Implementation of AsyncTask used to download XML feed from stackoverflow.com.
-    private class DownloadXmlTask extends AsyncTask<String, Void, Item> {
+    public class DownloadXmlTask extends AsyncTask<String, Void, Item> {
 
         @Override
         protected Item doInBackground(String... urls) {
             try {
                 return GetXML(urls[0]);
             } catch (Exception e) {
-                 e.getMessage();
+                e.getMessage();
                 return null;
             }
         }
 
         @Override
         protected void onPostExecute(Item result) {
-            if (result != null)
-            {
+            if (result != null) {
+
+
+                LogHelper.i("PostExecute", "DATA ID = ", result.getId());
+                LogHelper.i("PostExecute", "DATA Title = ", result.getTitle());
+                LogHelper.i("PostExecute", "DATA Album = ", result.getAlbum());
+                LogHelper.i("PostExecute", "DATA Artist = ", result.getArtist());
+                LogHelper.i("PostExecute", "DATA Duration = ", result.getDuration());
+
+
+
                 try {
-                    if (metadataList.size() > 20)
-                        metadataList.removeAll(metadataList);
-                    metadataList.add(result);
-                }catch (Exception e)
-                {
-                    LogHelper.c(1, "onPostExecute", "try1 Exception: ", result.getId());
-                }
-                try {
-                    //run();
-                }catch (Exception e)
-                {
-                    LogHelper.c(1, "onPostExecute", "getXmlFromUrl(URL)", e.getMessage());
+                    LogHelper.i("PostExecute", "try");
+                    metaIsChanged = false;
+                    if (items.size() > 0)
+                    {
+                        if (!items.get(items.size() - 1).getId().equals(result.getId()))
+                        {
+                            LogHelper.i("PostExecute", "BBBBBBBBBBBB");
+                            items.add(result);
+                            metaIsChanged = true;
+                        }
+                    }
+                    if (items.size() == 0) {
+                        LogHelper.i("PostExecute", "AAAAAAAAAAAA");
+                        items.add(result);
+                        metaIsChanged = true;
+                    }
+                } catch (Exception e) {
+                    LogHelper.i("onPostExecute", "getXmlFromUrl(URL)", e.getMessage());
                 }
             }
         }
     }
 
-    /*
-    Runnable rnbl = null;
-    Handler hndlr;
-    private void run()
-    {
-        if(rnbl != null)
-            hndlr.removeCallbacks(rnbl);
 
-        if(hndlr == null) {
-            hndlr = new Handler();
-
-            rnbl = new Runnable() {
-                public void run() {
-
-                    LogHelper.i("onPostExecute", "RUN()", "Running....");
-                    getXmlFromUrl(URL);
-                    hndlr.postDelayed(this, 3000);
-                }
-            };
-            hndlr.postDelayed(rnbl , 3000);
-        }
-    }
-
-    */
 }

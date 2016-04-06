@@ -255,81 +255,43 @@ public class MusicService extends MediaBrowserServiceCompat implements
         mMediaRouter = MediaRouter.getInstance(getApplicationContext());
 
         registerCarConnectionReceiver();
+
         run();
     }
 
-    //TODO: Complete propper implementation
+    //TODO: !!! HGL !!! Complete propper implementation
     Runnable runnable = null;
     Handler handler;
-
-    protected static final String URL =
-            "http://kristennetradio.dk/scripts/getCurrentSong.php";
-
-    String pictureRoot = "http://kristennetradio.dk/SBC/samHTMweb/pictures/";
-    String pictureName = "netradio.jpeg";
-    String currentSongID = "noID";
-    String currentSongTitle = "Kristen Net Radio";
-    int arrayListSize;
+    int i = 0;
     private MediaMetadataCompat metaDataBuild;
-    RemoteSource remoteSource;
 
     private void run()
     {
+        LogHelper.i("KNR", "run() ", "MusicService");
+
         if(runnable != null)
             handler.removeCallbacks(runnable);
 
         if(handler == null) {
             handler = new Handler();
 
-            runnable = new Runnable() {
-                public void run() {
-
-                    arrayListSize = MusicProviderSource.metadataList.size();
-                    remoteSource = new RemoteSource();
-                    remoteSource.getXmlFromUrl(URL);
-
-
-                    if (arrayListSize > 0) {
-                        LogHelper.i("KNR", "metadataList.size() = ", MusicProviderSource.metadataList.size());
-
-                        int lastSongInList = MusicProviderSource.metadataList.size() - 1;
-
-                        if (!MusicProviderSource.metadataList.get(lastSongInList).getTitle().equals(currentSongTitle)) {
-
-                            currentSongTitle = MusicProviderSource.metadataList.get(lastSongInList).getTitle();
-
-                            LogHelper.i("KNR", "NEW Song ", currentSongTitle);
-
-                            currentSongID = MusicProviderSource.metadataList.get(lastSongInList).getId();
-
-                            if (MusicProviderSource.metadataList.get(lastSongInList).getPicture() == null)
-                                pictureName = MusicProviderSource.metadataList.get(lastSongInList).getPicture();
-                            else pictureName = "netradio.jpeg";
-
-                            for (int l = 0; l < MusicProviderSource.metadataList.size(); l++) {
-                                LogHelper.i("KNR", "Song " + l + " = ", MusicProviderSource.metadataList.get(l).getTitle());
-                            }
-                            try {
-                                metaDataBuild = new MediaMetadataCompat.Builder()
-                                        .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, MusicProviderSource.metadataList.get(lastSongInList).getId())
-                                        .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, MusicProviderSource.metadataList.get(lastSongInList).getAlbum())
-                                        .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, MusicProviderSource.metadataList.get(lastSongInList).getArtist())
-                                        .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, Long.parseLong(MusicProviderSource.metadataList.get(lastSongInList).getDuration()))
-                                        .putString(MediaMetadataCompat.METADATA_KEY_GENRE, "Mere end bare musik")
-                                        .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, pictureRoot + pictureName)
-                                        .putString(MediaMetadataCompat.METADATA_KEY_TITLE, MusicProviderSource.metadataList.get(lastSongInList).getTitle())
-                                        .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, arrayListSize)
-                                        .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, 99)
-                                        .build();
-
-                            } catch (Exception e) {
-                                LogHelper.c(1, "KNR", "Failed building metadata", e.getMessage());
-                            }
-                            try {
-                                getMusicSession().setMetadata(metaDataBuild);
-                            } catch (Exception e) {
-                                LogHelper.c(1, "KNR", "Failed building metadata", e.getMessage());
-                            }
+            runnable = new Runnable()
+            {
+                public void run()
+                {
+                    try {
+                        RemoteSource remoteSource = new RemoteSource();
+                        remoteSource.getXmlFromUrl(Constants.META_DATA_URL);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    if (MusicProviderSource.items.size() > 0)
+                    {
+                        if (RemoteSource.metaIsChanged) {
+                            LogHelper.i("KNR___", "metaIsChanged = ", RemoteSource.metaIsChanged);
+                            LogHelper.i("KNR___", "MusicProviderSource.items.size() ", MusicProviderSource.items.size());
+                            LogHelper.i("KNR___", "UPDATING UI METADATA ", MusicProviderSource.items.size());
+                            updateMusicMeta();
                         }
                     }
                     //TODO: Every "current time" - "current duration"
@@ -349,9 +311,35 @@ public class MusicService extends MediaBrowserServiceCompat implements
                 }
             };
 
-            handler.postDelayed(runnable , 1000); // Every 120000 ms (2 minutes)
+            handler.postDelayed(runnable , 0); // Every 120000 ms (2 minutes)
         }
 
+    }
+
+
+    public void updateMusicMeta()
+    {
+        try {
+            metaDataBuild = new MediaMetadataCompat.Builder()
+                    .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, RemoteSource.ID)
+                    .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, RemoteSource.ALBUM)
+                    .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, RemoteSource.ARTIST)
+                    .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, RemoteSource.DURATION)
+                    .putString(MediaMetadataCompat.METADATA_KEY_GENRE, "Mere end bare musik")
+                    .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, RemoteSource.IMAGE)
+                    .putString(MediaMetadataCompat.METADATA_KEY_TITLE, RemoteSource.TITLE)
+                    .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, RemoteSource.TRACK_NUMBER)
+                    .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, 99)
+                    .build();
+
+        } catch (Exception e) {
+            LogHelper.c(1, "KNR", "Failed setting metadata", e.getMessage());
+        }
+        try {
+            getMusicSession().setMetadata(metaDataBuild);
+        } catch (Exception e) {
+            LogHelper.c(1, "KNR", "Failed building metadata", e.getMessage());
+        }
     }
 
     /**
