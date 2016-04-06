@@ -174,7 +174,7 @@ public class RemoteSource implements MusicProviderSource {
                 //GENRE = Constants.DEFAULT_GENRE;
                 //SOURCE = Constants.STREAM_URL;
 
-                if (result.getPicture() != null) {
+                if (result.getPicture() != null && !result.getPicture().equals("none")) {
                     IMAGE = Constants.IMAGE_ROOT + result.getPicture();
                 }
                 //TRACK_NUMBER = Constants.DEFAULT_TRACK_NUMBER;
