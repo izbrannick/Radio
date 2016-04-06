@@ -167,11 +167,32 @@ public class RemoteSource implements MusicProviderSource {
             if (result != null) {
 
 
-                LogHelper.i("PostExecute", "DATA ID = ", result.getId());
-                LogHelper.i("PostExecute", "DATA Title = ", result.getTitle());
-                LogHelper.i("PostExecute", "DATA Album = ", result.getAlbum());
-                LogHelper.i("PostExecute", "DATA Artist = ", result.getArtist());
-                LogHelper.i("PostExecute", "DATA Duration = ", result.getDuration());
+                ID = result.getId();
+                TITLE = result.getTitle();
+                ALBUM = result.getAlbum();
+                ARTIST = result.getArtist();
+                //GENRE = Constants.DEFAULT_GENRE;
+                //SOURCE = Constants.STREAM_URL;
+
+                if (result.getPicture() != null) {
+                    IMAGE = Constants.IMAGE_ROOT + result.getPicture();
+                }
+                //TRACK_NUMBER = Constants.DEFAULT_TRACK_NUMBER;
+                try {
+                    DURATION = Long.parseLong(result.getDuration());
+                }
+
+                catch (NumberFormatException n){
+                    LogHelper.i("PostExecute", "DATA DURATION = ", n.getMessage());
+                }
+
+                IMAGE = IMAGE.replace(" ", "%20");
+
+                LogHelper.i("PostExecute", "DATA ID = ", ID);
+                LogHelper.i("PostExecute", "DATA Title = ", TITLE);
+                LogHelper.i("PostExecute", "DATA Album = ", ALBUM);
+                LogHelper.i("PostExecute", "DATA Artist = ", ARTIST);
+                LogHelper.i("PostExecute", "DATA Duration = ", DURATION);
 
 
 
