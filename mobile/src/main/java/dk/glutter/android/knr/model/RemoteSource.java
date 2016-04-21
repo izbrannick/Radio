@@ -53,7 +53,7 @@ public class RemoteSource implements MusicProviderSource {
         SOURCE = Constants.STREAM_URL;
         IMAGE = Constants.IMAGE_ROOT + Constants.DEFAULT_IMAGE;
         TRACK_NUMBER = Constants.DEFAULT_TRACK_NUMBER;
-        DURATION = Constants.IMAGE_DURATION;
+        DURATION = Constants.DEFAULT_DURATION;
 
         // Since we don't have a unique ID in the server, we fake one using the hashcode of
         // the music source. In a real world app, this could come from the server.

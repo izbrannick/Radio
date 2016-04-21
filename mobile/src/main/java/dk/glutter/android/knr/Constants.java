@@ -23,5 +23,5 @@ public final class Constants {
     public static final String DEFAULT_ARTIST = "KNR";
     public static final String DEFAULT_GENRE = "Mere end bare musik";
     public static final int DEFAULT_TRACK_NUMBER = 1;
-    public static final long IMAGE_DURATION =  20000; // ms;
+    public static final long DEFAULT_DURATION =  20000; // ms;
 }

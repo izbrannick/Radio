@@ -333,12 +333,28 @@ public class MusicService extends MediaBrowserServiceCompat implements
                     .build();
 
         } catch (Exception e) {
-            LogHelper.c(1, "KNR", "Failed setting metadata", e.getMessage());
+            LogHelper.e("KNR", "Failed setting metadata 1", e.getMessage());
+            try {
+                metaDataBuild = new MediaMetadataCompat.Builder()
+                        .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, "1234567")
+                        .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, Constants.DEFAULT_ALBUM)
+                        .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, Constants.DEFAULT_ARTIST)
+                        .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, Constants.DEFAULT_DURATION)
+                        .putString(MediaMetadataCompat.METADATA_KEY_GENRE, "Mere end bare musik")
+                        .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, Constants.DEFAULT_IMAGE_TOTAL_ENDPOINT)
+                        .putString(MediaMetadataCompat.METADATA_KEY_TITLE, Constants.DEFAULT_TITLE)
+                        .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, Constants.DEFAULT_TRACK_NUMBER)
+                        .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, 99)
+                        .build();
+
+            } catch (Exception ee) {
+                LogHelper.e("KNR", "Failed setting metadata 2", ee.getMessage());
+            }
         }
         try {
             getMusicSession().setMetadata(metaDataBuild);
         } catch (Exception e) {
-            LogHelper.c(1, "KNR", "Failed building metadata", e.getMessage());
+            LogHelper.e("KNR", "Failed building metadata", e.getMessage());
         }
     }
 
