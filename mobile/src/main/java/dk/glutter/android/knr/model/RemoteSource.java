@@ -76,38 +76,12 @@ public class RemoteSource implements MusicProviderSource {
                 .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, TRACK_NUMBER)
                 .build();
     }
-/*
-    Runnable rnbl = null;
-    Handler hndlr;
-    public void run()
-    {
-        if(rnbl != null)
-            hndlr.removeCallbacks(rnbl);
-
-        if(hndlr == null) {
-            hndlr = new Handler();
-
-            rnbl = new Runnable() {
-                public void run() {
-
-                    LogHelper.i("RUN()", "getXmlFromUrl....");
-                    getXmlFromUrl(Constants.META_DATA_URL);
-                    hndlr.postDelayed(this, 10000);
-                }
-            };
-            hndlr.postDelayed(rnbl , 0);
-        }
-    }
-
-*/
 
     public void getXmlFromUrl(String url) {
-        LogHelper.e("...getXmlFromUrl...", "ZZZZZZZZZZZZZZ");
-
         try {
             new DownloadXmlTask().execute(url);
         } catch (Exception e) {
-            e.printStackTrace();
+            LogHelper.e("KNR", "Failed getting XML: ", e.getMessage());
         }
 
     }
@@ -149,7 +123,6 @@ public class RemoteSource implements MusicProviderSource {
 
     public static boolean metaIsChanged = false;
 
-    // Implementation of AsyncTask used to download XML feed from stackoverflow.com.
     public class DownloadXmlTask extends AsyncTask<String, Void, Item> {
 
         @Override
@@ -201,20 +174,21 @@ public class RemoteSource implements MusicProviderSource {
                     metaIsChanged = false;
                     if (items.size() > 0)
                     {
+                        LogHelper.i("PostExecute", "List Size > 0");
                         if (!items.get(items.size() - 1).getId().equals(result.getId()))
                         {
-                            LogHelper.i("PostExecute", "BBBBBBBBBBBB");
+                            LogHelper.i("PostExecute", "List Elements are different");
                             items.add(result);
                             metaIsChanged = true;
                         }
                     }
                     if (items.size() == 0) {
-                        LogHelper.i("PostExecute", "AAAAAAAAAAAA");
+                        LogHelper.i("PostExecute", "List Size = 0");
                         items.add(result);
                         metaIsChanged = true;
                     }
                 } catch (Exception e) {
-                    LogHelper.i("onPostExecute", "getXmlFromUrl(URL)", e.getMessage());
+                    LogHelper.e("onPostExecute", "getXmlFromUrl(URL)", e.getMessage());
                 }
             }
         }

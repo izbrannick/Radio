@@ -11,6 +11,8 @@ public final class Constants {
     public static final String IMAGE_ROOT = "http://kristennetradio.dk/SBC/samHTMweb/pictures/";
     // Default image
     public static final String DEFAULT_IMAGE = "netradio.jpeg";
+    // Default image with root
+    public static final String DEFAULT_IMAGE_TOTAL_ENDPOINT = "http://kristennetradio.dk/SBC/samHTMweb/pictures/netradio.jpeg";
     // Radio URL
     public static final String META_DATA_URL = "http://kristennetradio.dk/scripts/getCurrentSong.php";
     // Metadata URL

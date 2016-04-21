@@ -18,6 +18,7 @@ package dk.glutter.android.knr.ui;
 import android.app.Fragment;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
@@ -165,6 +166,12 @@ public class PlaybackControlsFragment extends Fragment {
                 mAlbumArt.setImageBitmap(art);
             } else {
                 cache.fetch(artUrl, new AlbumArtCache.FetchListener() {
+                            @Override
+                            public void onError(String artUrl, Exception e) {
+                                Bitmap image = BitmapFactory.decodeResource(getResources(), R.drawable.bg);
+                                mAlbumArt.setImageBitmap(image);
+                            }
+
                             @Override
                             public void onFetched(String artUrl, Bitmap bitmap, Bitmap icon) {
                                 if (icon != null) {

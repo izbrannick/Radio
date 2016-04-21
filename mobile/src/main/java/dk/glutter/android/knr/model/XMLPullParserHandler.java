@@ -53,7 +53,7 @@ public class XMLPullParserHandler {
             String str = total.toString();
 
             str = encodeThenDecode(str);
-            LogHelper.e("KNR", "encodeThenDecode str= ", str);
+            LogHelper.i("KNR", "encodeThenDecode xml: ", str);
             StringReader strReader = new StringReader(str);
 
             parser.setInput(strReader);
@@ -104,9 +104,9 @@ public class XMLPullParserHandler {
                 eventType = parser.next();
             }
         } catch (XmlPullParserException e) {
-            LogHelper.i("KNR", "XmlPullParserException ", e);
+            LogHelper.e("KNR", "XmlPullParserException ", e);
         } catch (IOException e) {
-            LogHelper.i("KNR", "Xml IOException ", e);
+            LogHelper.e("KNR", "Xml IOException ", e);
         }
         return item;
     }

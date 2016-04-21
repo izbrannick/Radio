@@ -18,6 +18,7 @@ package dk.glutter.android.knr.ui;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -312,6 +313,12 @@ public class FullScreenPlayerActivity extends ActionBarCastActivity {
         } else {
             // otherwise, fetch a high res version and update:
             cache.fetch(artUrl, new AlbumArtCache.FetchListener() {
+                @Override
+                public void onError(String artUrl, Exception e) {
+                    Bitmap image = BitmapFactory.decodeResource(getResources(), R.drawable.bg);
+                    mBackgroundImage.setImageBitmap(image);
+                }
+
                 @Override
                 public void onFetched(String artUrl, Bitmap bitmap, Bitmap icon) {
                     // sanity check, in case a new fetch request has been done while
